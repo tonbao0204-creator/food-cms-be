@@ -14,6 +14,11 @@ namespace SalesApi.Models
         // Bảng Users mới
         public DbSet<User> Users { get; set; }
 
+        public DbSet<Food> Foods { get; set; }
+        public DbSet<Customer> Customers { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderDetail> OrderDetails { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

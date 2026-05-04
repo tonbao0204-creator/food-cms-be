@@ -160,3 +160,7 @@ D:\Tôn Bảo\DuAnMoi\SalesApi\obj\Debug\net9.0\refint\SalesApi.dll
 D:\Tôn Bảo\DuAnMoi\SalesApi\obj\Debug\net9.0\SalesApi.pdb
 D:\Tôn Bảo\DuAnMoi\SalesApi\obj\Debug\net9.0\SalesApi.genruntimeconfig.cache
 D:\Tôn Bảo\DuAnMoi\SalesApi\obj\Debug\net9.0\ref\SalesApi.dll
+D:\Tôn Bảo\DuAnMoi\SalesApi\bin\Debug\net9.0\BCrypt.Net-Next.dll
+D:\Tôn Bảo\DuAnMoi\SalesApi\bin\Debug\net9.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\Tôn Bảo\DuAnMoi\SalesApi\obj\Debug\net9.0\SalesApi.sourcelink.json
+D:\Tôn Bảo\DuAnMoi\SalesApi\bin\Debug\net9.0\Scalar.AspNetCore.dll
