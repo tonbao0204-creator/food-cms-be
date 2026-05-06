@@ -29,16 +29,72 @@ namespace SalesApi.Controllers
             
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             {
-                return Unauthorized(new { message = "Sai tên đăng nhập hoặc mật khẩu" });
+                return Unauthorized(new ApiResponse<AuthResponse>
+                {
+                    Success = false,
+                    Message = "Sai tên đăng nhập hoặc mật khẩu"
+                });
             }
 
             var token = GenerateJwtToken(user);
 
-            return Ok(new AuthResponse
+            return Ok(new ApiResponse<AuthResponse>
             {
-                Token = token,
-                Username = user.Username,
-                Role = user.Role
+                Success = true,
+                Message = "Đăng nhập thành công",
+                Data = new AuthResponse
+                {
+                    Token = token,
+                    Username = user.Username,
+                    Role = user.Role
+                }
+            });
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrWhiteSpace(request.Password))
+            {
+                return BadRequest(new ApiResponse<AuthResponse>
+                {
+                    Success = false,
+                    Message = "Username và password không được để trống"
+                });
+            }
+
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
+            if (existingUser != null)
+            {
+                return BadRequest(new ApiResponse<AuthResponse>
+                {
+                    Success = false,
+                    Message = "Username đã tồn tại"
+                });
+            }
+
+            var user = new User
+            {
+                Username = request.Username,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                Role = "Admin"
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            var token = GenerateJwtToken(user);
+
+            return Ok(new ApiResponse<AuthResponse>
+            {
+                Success = true,
+                Message = "Đăng ký thành công",
+                Data = new AuthResponse
+                {
+                    Token = token,
+                    Username = user.Username,
+                    Role = user.Role
+                }
             });
         }
 
@@ -48,20 +104,28 @@ namespace SalesApi.Controllers
             var adminExists = await _context.Users.AnyAsync(u => u.Username == "admin");
             if (adminExists)
             {
-                return BadRequest(new { message = "Tài khoản admin đã tồn tại!" });
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "Tài khoản admin đã tồn tại!"
+                });
             }
 
             var adminUser = new User
             {
                 Username = "admin",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"), // Mật khẩu mặc định là admin123
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
                 Role = "Admin"
             };
 
             _context.Users.Add(adminUser);
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Tạo tài khoản Admin thành công! Tài khoản: admin / Mật khẩu: admin123" });
+            return Ok(new ApiResponse<object>
+            {
+                Success = true,
+                Message = "Tạo tài khoản Admin thành công! Tài khoản: admin / Mật khẩu: admin123"
+            });
         }
 
         private string GenerateJwtToken(User user)

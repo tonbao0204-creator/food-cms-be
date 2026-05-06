@@ -10,6 +10,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+// Cấu hình CORS để cho phép yêu cầu từ Frontend
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+
 // Đăng ký AppDbContext với SQL Server
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -37,7 +48,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddControllers();
 builder.Services.AddControllers();
 
 builder.Services.AddOpenApi(options =>
@@ -89,10 +99,18 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
+
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Serve static files
+app.UseStaticFiles();
+
+// Serve index.html for SPA routing
+app.MapFallbackToFile("index.html");
 
 app.MapControllers();
 
